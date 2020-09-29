@@ -1,27 +1,60 @@
-from typing import List, Optional
+from typing import List, Optional, Enum
 
 from pydantic import BaseModel
 
 
-class Job(BaseModel):
+class JobRequest(BaseModel):
+    protein_sequence: str
+    mutations: str
+    ligand_sequence: Optional[str]
+    structural_template: Optional[str]
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "protein_sequence": "AAA",
+                "mutations": "A1G,A1L",
+            }
+        }
+
+
+class JobResponse(BaseModel):
+    job_id: str
+    job_url: str
+
+
+class JobStatus(BaseModel):
+    job_id: str
+    status: "JobState"
+
+
+class JobState(Enum):
+    pending = "pending"
+    running = "running"
+    failed = "failed"
+    completed = "completed"
+
+
+class JobResults(BaseModel):
     """The main job class populated throughout the job execution pipeline."""
 
-    # Protein and mutation info
     job_id: str
+
+    # Protein and mutation info
     protein_sequence: str
-    ligand_sequence: Optional[str]
     mutations: str
+    ligand_sequence: Optional[str]
 
     # Structural template
     query_start_pos: int
     query_end_pos: int
     alignment_query_sequence: str
     alignment_template_sequence: str
-    template_structure: str
-    model_stricture: str
+    structural_template: str
+    homology_model: str
 
     # Mutation
-    mutation_scores: List["Mutation"]
+    # mutation_scores: List["Mutation"]
 
 
 class Mutation(BaseModel):
@@ -30,22 +63,4 @@ class Mutation(BaseModel):
     ev2seqscore: float
     ev2iscore: float
     ev2iseqscore: float
-
-
-class JobRequest(BaseModel):
-    protein_sequence: str
-    ligand_sequence: Optional[str]
-    mutations: str
-    template_structure: Optional[str]
-
-
-class JobSubmission(BaseModel):
-    status: str
-    job_id: Optional[str]
-    job_url: Optional[str]
     message: Optional[str]
-
-
-class JobStatus(BaseModel):
-    job_id: str
-    status: str

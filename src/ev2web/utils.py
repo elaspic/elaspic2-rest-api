@@ -19,6 +19,9 @@ def check_mutations(mutations: str) -> bool:
     return True
 
 
-def mutation_matches_sequence(aa_sequence: str, mutation: str) -> bool:
-    wt, pos, _ = mutation[0], int(mutation[1:-1]), mutation[-1]
-    return aa_sequence[pos - 1] == wt
+def check_mutations_match_sequence(aa_sequence: str, mutations: str) -> bool:
+    for mutation in mutations.split(","):
+        wt, pos, _ = mutation[0], int(mutation[1:-1]), mutation[-1]
+        if aa_sequence[pos - 1] != wt:
+            return False
+    return True

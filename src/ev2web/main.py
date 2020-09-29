@@ -2,62 +2,79 @@ from collections import deque
 from typing import Any, Deque, Mapping, Optional
 
 import sentry_sdk
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 from starlette import status
 from starlette.responses import RedirectResponse, Response
 
-from ev2web import config, gitlab, types, utils
+from ev2web import config, state, gitlab, types, utils
 
-tags_metadata = [
-    {
-        "name": "jobs",
-        "description": "Manage items. So _fancy_ they have their own docs.",
-        "externalDocs": {
-            "description": "Items external docs",
-            "url": "https://fastapi.tiangolo.com/",
-        },
-    },
-]
+# tags_metadata = [
+#     {
+#         "name": "jobs",
+#         "description": "Manage items. So _fancy_ they have their own docs.",
+#         "externalDocs": {
+#             "description": "Items external docs",
+#             "url": "https://fastapi.tiangolo.com/",
+#         },
+#     },
+# ]
 
 app = FastAPI(
     title="ELASPIC v2",
-    description="Version 2 of the ELASPIC pipeline (http://elaspic.kimlab.org).",
+    description="Version 2 of the ELASPIC pipeline (<http://elaspic.kimlab.org>).",
     version="0.1.0",
-    openapi_tags=tags_metadata,
+    # openapi_tags=tags_metadata,
 )
 
 
 @app.post(
     "/jobs/",
+    response_model=types.JobResponse,
+    status_code=202,
     tags=["jobs"],
-    response_model=types.JobSubmission,
-    status_code=status.HTTP_202_ACCEPTED,
+    summary="Submit a New Job",
 )
 async def create_job(*, request: types.JobRequest, response: Response):
-    # Validation
+    """
+    Create a new job evaluating the effect of mutation(s) on the stability of a single protein
+    for the affinity between two proteins.
+
+    **Arguments:**
+
+    - **protein_sequence**: Amino acid sequence of the protein being mutated.
+    - **mutations**: One or more mutations to be evaluated.
+        Multiple mutations should be separated with a comma.
+    - **ligand_sequence**: Amino acid sequence of the interacting protein.
+    - **structural_template**: Structural template to be used for modelling the structure
+        of the protein or the interaction between the protein and the ligand. The template should
+        be provided as a gzip-compressed, and base64-encoded, PDB or mmCIF file.
+    """
     if not utils.check_aa_sequence(request.protein_sequence):
-        return {"status": "Error", "message": "Protein sequence is malformed."}
-    if not utils.check_aa_sequence(request.protein_sequence):
-        return {"status": "Error", "message": "Ligand sequence is malformed."}
+        raise HTTPException(status_code=400, detail="Protein sequence is malformed")
+    if request.ligand_sequence is not None and not utils.check_aa_sequence(request.ligand_sequence):
+        raise HTTPException(status_code=400, detail="Ligand sequence is malformed")
     if not utils.check_mutations(request.mutations):
-        return {"status": "Error", "message": "Mutations are in an unsupported format."}
-    if not utils.mutation_matches_sequence(request.protein_sequence, request.mutations):
-        return {"status": "Error", "message": "Mutation(s) do not match the protein sequence."}
+        raise HTTPException(status_code=400, detail="Mutations are in an unsupported format")
+    if not utils.check_mutations_match_sequence(request.protein_sequence, request.mutations):
+        raise HTTPException(status_code=400, detail="Mutation(s) do not match the protein sequence")
 
     job_id = utils.get_job_id(request.protein_sequence, request.ligand_sequence, request.mutations)
-    job_location = f"/jobs/{job_id}/"
+    job_url = f"/jobs/{job_id}/"
 
-    # Enqueue job
-    job = JobContainer(job_id=job_id, **dict(request))
-    queues["pending"].append(job)
+    state.queues["pending"].append(job_id)
 
-    response.headers["Location"] = job_location
-    return {"status": "Submitted", "job_id": job_id, "job_location": job_location}
+    response.headers["Location"] = job_url
+    return {"job_id": job_id, "job_url": job_url}
 
 
-@app.get("/jobs/{job_id}", tags=["jobs"], response_model=types.JobStatus)
+@app.get(
+    "/jobs/{job_id}",
+    response_model=types.JobResults,
+    tags=["jobs"],
+    summary="Get Job Status and Results",
+)
 async def read_job_status(job_id: str):
     result = dict(
         id=job_id,
@@ -68,29 +85,21 @@ async def read_job_status(job_id: str):
     return RedirectResponse(url=f"/job/{job_id}/result", status_code=status.HTTP_303_SEE_OTHER)
 
 
-@app.get("/jobs/{job_id}/result", tags=["jobs"], response_model=types.JobStatus)
-async def read_job_result(job_id: str):
-    result = dict(
-        id=job_id,
-        status=["pending", "done"],
-        progress="0",
-        submitted_utc_time="",
-    )
-    return RedirectResponse(url=f"/job/{job_id}/result", status_code=status.HTTP_302_FOUND)
-    pass
+@app.delete(
+    "/jobs/{job_id}",
+    tags=["jobs"],
+    summary="Delete Job",
+)
+async def delete_job(job_id: str):
+    """Delete job and data associated with the given `job_id`."""
+    gitlab.delete_job(job_id)
 
 
-@app.delete("/jobs/{job_id}", tags=["jobs"])
-async def delete_job_1(job_id: str):
-    return gitlab.delete_job(job_id)
-
-
-@app.delete("/jobs/{job_id}/result", tags=["jobs"])
-async def delete_job_2(job_id: str):
-    return gitlab.delete_job(job_id)
-
-
-@app.get("/_ah/warmup", status_code=status.HTTP_200_OK)
+@app.get(
+    "/_ah/warmup",
+    status_code=200,
+    include_in_schema=False,
+)
 def warmup():
     # Handle your warmup logic here, e.g. set up a database connection pool
     return {}
