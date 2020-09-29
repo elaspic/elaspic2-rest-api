@@ -1,0 +1,26 @@
+package:
+  name: elaspic-v2-web
+  version: 0.1.0
+
+source:
+  path: ../../
+
+build:
+  script: {{ PYTHON }} -m pip install . --no-deps --ignore-installed -vv
+  number: 0
+  noarch: python
+
+requirements:
+  build:
+    - python
+  run:
+    - python
+
+test:
+  imports:
+    - ev2web
+
+about:
+  home: https://gitlab.com/ostrokach/elaspic-v2-web
+  license: MIT License
+  summary: "ELASPIC v2 web server"

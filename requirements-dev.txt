@@ -1,0 +1,7 @@
+fastapi
+google-cloud-firestore
+google-cloud-storage
+gunicorn
+python-gitlab
+sentry-sdk
+uvicorn

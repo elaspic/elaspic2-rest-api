@@ -1,0 +1,20 @@
+default_context:
+  full_name: "Alexey Strokach"
+  email: "alex.strokach@utoronto.ca"
+  git_url: "https://gitlab.com"
+  git_username: "ostrokach"
+  anaconda_username: "ostrokach-forge"
+  pypi_username: "ostrokach"
+  project_name: "elaspic-v2-web"
+  project_slug: "ev2web"
+  project_import: "ev2web"
+  project_short_description: "ELASPIC v2 web server"
+  version: "0.1.0"
+  create_author_file: "y"
+  open_source_license: "MIT License"
+  _copy_without_render:
+    - docs/output_toggle.tpl
+    - docs/_templates/logo-image.html
+    - docs/_templates/autosummary/class.rst
+    - docs/_templates/autosummary/module.rst
+    - .ci/pages/templates/index.html
