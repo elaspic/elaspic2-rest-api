@@ -1,4 +1,3 @@
-# Base
 fastapi
 google-cloud-firestore
 google-cloud-storage
@@ -6,10 +5,3 @@ gunicorn
 python-gitlab
 sentry-sdk
 uvicorn
-
-# Dev
-black
-coverage
-flake8
-isort
-pytest
