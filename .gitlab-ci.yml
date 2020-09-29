@@ -11,8 +11,6 @@ variables:
 
 test:
   stage: test
-  extends:
-    - .configure
   script:
     # Create clean environment
     - conda create -n test -q "python=${PYTHON_VERSION}"
