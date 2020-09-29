@@ -1,6 +1,6 @@
+import functools
 import re
 import uuid
-import functools
 
 
 @functools.lru_cache(maxsize=128, typed=False)
