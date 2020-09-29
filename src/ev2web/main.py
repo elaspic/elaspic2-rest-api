@@ -2,7 +2,6 @@ from collections import deque
 from typing import Any, Deque, Mapping, Optional
 
 import sentry_sdk
-import sqlalchemy as sa
 from fastapi import FastAPI
 from pydantic import BaseModel
 from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
@@ -31,7 +30,10 @@ app = FastAPI(
 
 
 @app.post(
-    "/jobs/", tags=["jobs"], response_model=JobSubmission, status_code=status.HTTP_202_ACCEPTED
+    "/jobs/",
+    tags=["jobs"],
+    response_model=types.JobSubmission,
+    status_code=status.HTTP_202_ACCEPTED,
 )
 async def create_job(*, request: types.JobRequest, response: Response):
     # Validation
@@ -55,8 +57,8 @@ async def create_job(*, request: types.JobRequest, response: Response):
     return {"status": "Submitted", "job_id": job_id, "job_location": job_location}
 
 
-@app.get("/jobs/{job_id}", tags=["jobs"], response_model=JobStatus)
-async def read_job(job_id: str):
+@app.get("/jobs/{job_id}", tags=["jobs"], response_model=types.JobStatus)
+async def read_job_status(job_id: str):
     result = dict(
         id=job_id,
         status=["pending", "done"],
@@ -66,8 +68,8 @@ async def read_job(job_id: str):
     return RedirectResponse(url=f"/job/{job_id}/result", status_code=status.HTTP_303_SEE_OTHER)
 
 
-@app.get("/jobs/{job_id}/result", tags=["jobs"], response_model=JobStatus)
-async def read_job(job_id: str):
+@app.get("/jobs/{job_id}/result", tags=["jobs"], response_model=types.JobStatus)
+async def read_job_result(job_id: str):
     result = dict(
         id=job_id,
         status=["pending", "done"],
@@ -96,14 +98,14 @@ def warmup():
 
 @app.on_event("startup")
 async def on_startup() -> None:
-    config.engine = sa.create_engine()
+    pass
 
 
 @app.on_event("shutdown")
 async def on_shutdown() -> None:
-    config.engine.close()
+    pass
 
 
 if config.SENTRY_DSN:
     sentry_sdk.init(config.SENTRY_DSN)
-    app = SentryAsgiMiddleware(app)
+    app = SentryAsgiMiddleware(app)  # typing: ignore
