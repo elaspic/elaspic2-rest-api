@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from pydantic import BaseModel
 
@@ -20,19 +20,29 @@ class JobRequest(BaseModel):
 
 
 class JobResponse(BaseModel):
-    job_id: str
-    job_url: str
+    id: str
+    location: str
 
 
-class JobStatus(BaseModel):
-    status: "JobState"
-
-
-class JobState(Enum):
+class JobStatus(Enum):
     pending = "pending"
     running = "running"
     failed = "failed"
-    completed = "completed"
+    succeeded = "succeeded"
+
+
+class JobState(BaseModel):
+    status: JobStatus
+    submitted_utc_time: Optional[str]
+
+
+class Mutation(BaseModel):
+    mutation: str
+    ev2score: float
+    ev2seqscore: float
+    ev2iscore: float
+    ev2iseqscore: float
+    errors: Optional[str]
 
 
 class JobResult(BaseModel):
@@ -52,13 +62,4 @@ class JobResult(BaseModel):
     homology_model: str
 
     # Mutation
-    # mutation_scores: List["Mutation"]
-
-
-class Mutation(BaseModel):
-    mutation: str
-    ev2score: float
-    ev2seqscore: float
-    ev2iscore: float
-    ev2iseqscore: float
-    message: Optional[str]
+    mutation_scores: List[Mutation]
