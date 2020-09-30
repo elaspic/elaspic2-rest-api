@@ -4,7 +4,7 @@ from typing import List
 
 import gitlab
 from gitlab import GitlabDeleteError, GitlabHttpError  # noqa
-
+from requests.exceptions import ChunkedEncodingError
 from ev2web import config
 from ev2web.types import JobRequest, JobResult, JobState
 
@@ -69,10 +69,14 @@ def get_job_result(job_id: int) -> JobResult:
             if _job.name == "collect-results" and _job.status == "success":
                 pipeline_job = _job
                 break
-
         if pipeline_job is None:
             raise GitlabHttpError
 
         job = project.jobs.get(pipeline_job.id, lazy=True)
-        data = job.artifact("result/combined.json").decode()
+
+        try:
+            data = job.artifact("result/combined.json").decode()
+        except ChunkedEncodingError:
+            raise GitlabHttpError
+
     return json.loads(data)

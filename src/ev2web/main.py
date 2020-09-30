@@ -9,6 +9,7 @@ import sentry_sdk
 from fastapi import FastAPI, HTTPException
 from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 from starlette import status
+from starlette.requests import Request
 from starlette.responses import RedirectResponse, Response
 
 from ev2web import config, gitlab, utils
@@ -22,7 +23,7 @@ app = FastAPI(
 
 
 @app.post("/jobs/", response_model=JobResponse, status_code=status.HTTP_202_ACCEPTED, tags=["jobs"])
-async def submit_job(*, request: JobRequest, response: Response):
+async def submit_job(*, input: JobRequest, request: Request, response: Response):
     """
     Create a new job evaluating the effect of mutation(s) on the stability of a single protein
     for the affinity between two proteins.
@@ -37,37 +38,37 @@ async def submit_job(*, request: JobRequest, response: Response):
         of the protein or the interaction between the protein and the ligand. The template should
         be provided as a gzip-compressed, and base64-encoded, PDB or mmCIF file.
     """
-    if not utils.check_aa_sequence(request.protein_sequence):
+    if not utils.check_aa_sequence(input.protein_sequence):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Protein sequence is malformed",
         )
-    if request.ligand_sequence is not None and not utils.check_aa_sequence(request.ligand_sequence):
+    if input.ligand_sequence is not None and not utils.check_aa_sequence(input.ligand_sequence):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Ligand sequence is malformed",
         )
-    if not utils.check_mutations(request.mutations):
+    if not utils.check_mutations(input.mutations):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Mutations are in an unexpected format",
         )
-    if not utils.check_mutations_match_sequence(request.protein_sequence, request.mutations):
+    if not utils.check_mutations_match_sequence(input.protein_sequence, input.mutations):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Mutation(s) do not match the protein sequence",
         )
 
     loop = asyncio.get_running_loop()
-    job_id = await loop.run_in_executor(None, gitlab.create_job, request)
+    job_id = await loop.run_in_executor(None, gitlab.create_job, input)
 
-    web_url = f"/jobs/{job_id}/"
+    web_url = f"{request.url}{job_id}/"
     response.headers["LOCATION"] = web_url
     return {"id": job_id, "web_url": web_url}
 
 
 @app.get("/jobs/{job_id}", response_model=JobState, tags=["jobs"])
-async def get_job_status(job_id: int, response: Response):
+async def get_job_status(job_id: int, request: Request, response: Response):
     """Get the status of a previously-submitted job.
 
     **Arguments:**
@@ -82,7 +83,7 @@ async def get_job_status(job_id: int, response: Response):
     if job_state.status != "success":
         return job_state
     else:
-        job_state.web_url = f"{config.HOST_URL}/jobs/{job_id}/result"
+        job_state.web_url = f"{request.url}/jobs/{job_id}/result"
         response.headers["LOCATION"] = job_state.web_url
         return RedirectResponse(url=job_state.web_url, status_code=status.HTTP_303_SEE_OTHER)
 
