@@ -8,7 +8,7 @@ from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 from starlette import status
 from starlette.responses import RedirectResponse, Response
 
-from ev2web import config, state, gitlab, types, utils
+from ev2web import config, gitlab, state, types, utils
 
 # tags_metadata = [
 #     {
@@ -71,9 +71,9 @@ async def create_job(*, request: types.JobRequest, response: Response):
 
 @app.get(
     "/jobs/{job_id}",
-    response_model=types.JobResults,
+    response_model=types.JobStatus,
     tags=["jobs"],
-    summary="Get Job Status and Results",
+    summary="Get Job Status",
 )
 async def read_job_status(job_id: str):
     result = dict(
@@ -93,6 +93,22 @@ async def read_job_status(job_id: str):
 async def delete_job(job_id: str):
     """Delete job and data associated with the given `job_id`."""
     gitlab.delete_job(job_id)
+
+
+@app.get(
+    "/jobs/{job_id}/result",
+    response_model=types.JobResult,
+    tags=["jobs"],
+    summary="Get Job Result",
+)
+async def read_job_status(job_id: str):
+    result = dict(
+        id=job_id,
+        status=["pending", "done"],
+        progress="0",
+        submitted_utc_time="",
+    )
+    return RedirectResponse(url=f"/job/{job_id}/result", status_code=status.HTTP_303_SEE_OTHER)
 
 
 @app.get(

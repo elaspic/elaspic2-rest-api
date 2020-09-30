@@ -1,4 +1,5 @@
-from typing import List, Optional, Enum
+from enum import Enum
+from typing import List, Optional
 
 from pydantic import BaseModel
 
@@ -24,7 +25,6 @@ class JobResponse(BaseModel):
 
 
 class JobStatus(BaseModel):
-    job_id: str
     status: "JobState"
 
 
@@ -35,10 +35,8 @@ class JobState(Enum):
     completed = "completed"
 
 
-class JobResults(BaseModel):
+class JobResult(BaseModel):
     """The main job class populated throughout the job execution pipeline."""
-
-    job_id: str
 
     # Protein and mutation info
     protein_sequence: str
