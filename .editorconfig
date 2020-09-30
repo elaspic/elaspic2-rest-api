@@ -21,6 +21,9 @@ indent_size = 2
 [*.yml]
 indent_size = 2
 
+[*.yml.j2]
+indent_size = 2
+
 [LICENSE]
 insert_final_newline = false
 
