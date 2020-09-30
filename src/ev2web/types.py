@@ -1,5 +1,4 @@
-from enum import Enum
-from typing import Any, List, Optional
+from typing import List, Optional
 
 from pydantic import BaseModel
 
@@ -21,19 +20,16 @@ class JobRequest(BaseModel):
 
 class JobResponse(BaseModel):
     id: str
-    location: str
-
-
-class JobStatus(Enum):
-    pending = "pending"
-    running = "running"
-    failed = "failed"
-    succeeded = "succeeded"
+    web_url: str
 
 
 class JobState(BaseModel):
-    status: JobStatus
-    submitted_utc_time: Optional[str]
+    id: int
+    status: str
+    created_at: Optional[str]
+    started_at: Optional[str]
+    finished_at: Optional[str]
+    web_url: Optional[str]
 
 
 class Mutation(BaseModel):

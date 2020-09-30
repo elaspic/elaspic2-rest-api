@@ -1,0 +1,26 @@
+include:
+  - project: "elaspic-jobs/elaspic-v2-jobs"
+    ref: master
+    file: "/templates/.gitlab-ci-template.yml"
+
+variables:
+  JOB_ID: "{{ job_id }}"
+  PROTEIN_SEQUENCE: "{{ protein_sequence }}"
+  LIGAND_SEQUENCE: "{{ ligand_sequence }}"
+  STRUCTURAL_TEMPLATE: "{{ structural_template }}"
+
+create-homology-model:
+  extends: .create-homology-model
+
+evaluate-mutations:
+  extends: .evaluate-mutations
+  parallel:
+    matrix:
+      - _DUMMY: empty
+        MUTATIONS:
+        {% for mutations in mutations_list %}
+          - "{{ mutations }}"
+        {% endfor %}
+
+collect-results:
+  extends: .collect-results
