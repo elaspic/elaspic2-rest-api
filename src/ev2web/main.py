@@ -7,6 +7,7 @@ import asyncio
 
 import sentry_sdk
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 from starlette import status
 from starlette.requests import Request
@@ -20,6 +21,8 @@ app = FastAPI(
     description="Version 2 of the ELASPIC pipeline (<http://elaspic.kimlab.org>).",
     version="0.1.0",
 )
+
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 
 @app.post("/jobs/", response_model=JobResponse, status_code=status.HTTP_202_ACCEPTED, tags=["jobs"])
