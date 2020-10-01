@@ -80,11 +80,17 @@ async def get_job_status(job_id: int, request: Request, response: Response):
         job_state = await loop.run_in_executor(None, gitlab.get_job_state, job_id)
     except gitlab.GitlabHttpError:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    if job_state.status == "success":
+        job_state.web_url = f"{request.url}/results"
+        response.headers["LOCATION"] = job_state.web_url
+
+    return job_state
+
+    # TODO: Re-evaluate when get_job_result works.
     if job_state.status != "success":
         return job_state
     else:
-        job_state.web_url = f"{request.url}/jobs/{job_id}/result"
-        response.headers["LOCATION"] = job_state.web_url
         return RedirectResponse(url=job_state.web_url, status_code=status.HTTP_303_SEE_OTHER)
 
 
@@ -103,7 +109,7 @@ async def delete_job(job_id: int):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
-@app.get("/jobs/{job_id}/result", response_model=JobResult, tags=["jobs"])
+@app.get("/jobs/{job_id}/results", response_model=JobResult, tags=["jobs"])
 async def get_job_result(job_id: int):
     """Get the result of a previously-submitted job.
 
@@ -135,5 +141,5 @@ async def on_shutdown() -> None:
 
 
 if config.SENTRY_DSN:
-    sentry_sdk.init(config.SENTRY_DSN)
+    sentry_sdk.init(config.SENTRY_DSN, traces_sample_rate=1.0)
     app = SentryAsgiMiddleware(app)  # type: ignore
