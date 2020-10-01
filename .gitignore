@@ -75,3 +75,6 @@ target/
 
 # Jupyter
 .ipynb_checkpoints
+
+# Secrets
+env_variables.yaml
