@@ -75,8 +75,8 @@ def get_job_result(job_id: int) -> JobResult:
         job = project.jobs.get(pipeline_job.id, lazy=True)
 
         try:
-            data = job.artifact("result/combined.json").decode()
+            data = job.artifact("results/combined.json")
         except ChunkedEncodingError:
             raise GitlabHttpError
 
-    return json.loads(data)
+    return json.loads(data.decode())
