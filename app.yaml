@@ -2,8 +2,8 @@ runtime: python38
 
 instance_class: B2
 
-env_variables:
-  BUCKET_NAME: "example-gcs-bucket"
+includes:
+  - env_variables.yaml
 
 handlers:
   # Matches requests to /images/... to files in static/images/...
