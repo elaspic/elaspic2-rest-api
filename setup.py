@@ -13,7 +13,7 @@ setup(
     long_description=read_md("README.md"),
     author="Alexey Strokach",
     author_email="alex.strokach@utoronto.ca",
-    url="https://gitlab.com/ostrokach/elaspic-v2-web",
+    url="https://gitlab.com/elaspic/elaspic2-web",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     package_data={},

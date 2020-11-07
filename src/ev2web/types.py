@@ -4,16 +4,21 @@ from pydantic import BaseModel
 
 
 class JobRequest(BaseModel):
+    protein_structure_url: str
     protein_sequence: str
     mutations: str
     ligand_sequence: Optional[str]
-    structural_template: Optional[str]
 
     class Config:
         schema_extra = {
             "example": {
-                "protein_sequence": "AAA",
+                "protein_structure_url": "https://files.rcsb.org/download/1MFG.pdb",
+                "protein_sequence": (
+                    "GSMEIRVRVEKDPELGFSISGGVGGRGNPFRPDDDGIFVTRVQPEGPASKLLQPGDKIIQA"
+                    "NGYSFINIEHGQAVSLLKTFQNTVELIIVREVSS"
+                ),
                 "mutations": "A1G,A1L",
+                "ligand_sequence": "EYLGLDVPV",
             }
         }
 
@@ -34,10 +39,9 @@ class JobState(BaseModel):
 
 class Mutation(BaseModel):
     mutation: str
-    ev2score: float
-    ev2seqscore: float
-    ev2iscore: float
-    ev2iseqscore: float
+    ev2_score: float
+    ev2seq_score: float
+    rosetta_score: float
     errors: Optional[str]
 
 

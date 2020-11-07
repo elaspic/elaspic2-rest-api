@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# elaspic-v2-web documentation build configuration file, created by
+# elaspic2-web documentation build configuration file, created by
 # sphinx-quickstart on Tue Jul  9 22:26:36 2013.
 #
 # This file is execfile()d with the current directory set to its
@@ -38,7 +38,7 @@ import ev2web
 
 # -- General configuration ---------------------------------------------
 
-gitlab_doc_root = "https://gitlab.com/ostrokach/elaspic-v2-web/-/tree/master/"
+gitlab_doc_root = "https://gitlab.com/elaspic/elaspic2-web/-/tree/master/"
 
 
 def setup(app):
@@ -92,7 +92,7 @@ source_parsers = {".md": CommonMarkParser}
 master_doc = "index"
 
 # General information about the project.
-project = "elaspic-v2-web"
+project = "elaspic2-web"
 copyright = "2020, Alexey Strokach"
 
 # The version info for the project you're documenting, acts as replacement
@@ -156,7 +156,7 @@ html_theme = "msmb_theme"
 html_theme_options = {"collapse_navigation": False, "display_version": True}
 
 # Context is a dictionary passed to the templating engine.
-html_context = {"versions_json_url": "https://elaspic-v2-web.gitlab.io/versions.json"}
+html_context = {"versions_json_url": "https://elaspic.gitlab.io/elaspic2-web/versions.json"}
 
 # Add any paths that contain custom themes here, relative to this directory.
 html_theme_path = [
@@ -231,7 +231,7 @@ html_static_path = ["_static"]
 # html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = "elaspic-v2-webdoc"
+htmlhelp_basename = "elaspic2-webdoc"
 
 
 # -- Options for LaTeX output ------------------------------------------
@@ -251,8 +251,8 @@ latex_elements = {
 latex_documents = [
     (
         "index",
-        "elaspic-v2-web.tex",
-        "elaspic-v2-web Documentation",
+        "elaspic2-web.tex",
+        "elaspic2-web Documentation",
         "Alexey Strokach",
         "manual",
     )
@@ -286,8 +286,8 @@ latex_documents = [
 man_pages = [
     (
         "index",
-        "elaspic-v2-web",
-        "elaspic-v2-web Documentation",
+        "elaspic2-web",
+        "elaspic2-web Documentation",
         ["Alexey Strokach"],
         1,
     )
@@ -305,10 +305,10 @@ man_pages = [
 texinfo_documents = [
     (
         "index",
-        "elaspic-v2-web",
-        "elaspic-v2-web Documentation",
+        "elaspic2-web",
+        "elaspic2-web Documentation",
         "Alexey Strokach",
-        "elaspic-v2-web",
+        "elaspic2-web",
         "One line description of project.",
         "Miscellaneous",
     )

@@ -1,5 +1,5 @@
 package:
-  name: elaspic-v2-web
+  name: elaspic2-web
   version: 0.1.0
 
 source:
@@ -21,6 +21,6 @@ test:
     - ev2web
 
 about:
-  home: https://gitlab.com/ostrokach/elaspic-v2-web
+  home: https://gitlab.com/elaspic/elaspic2-web
   license: MIT License
   summary: "ELASPIC v2 web server"

@@ -5,7 +5,7 @@ default_context:
   git_username: "ostrokach"
   anaconda_username: "ostrokach-forge"
   pypi_username: "ostrokach"
-  project_name: "elaspic-v2-web"
+  project_name: "elaspic2-web"
   project_slug: "ev2web"
   project_import: "ev2web"
   project_short_description: "ELASPIC v2 web server"
