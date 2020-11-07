@@ -5,8 +5,9 @@ from typing import List
 import gitlab
 from gitlab import GitlabDeleteError, GitlabHttpError  # noqa
 from requests.exceptions import ChunkedEncodingError
+
 from ev2web import config
-from ev2web.types import JobRequest, JobResult, JobState
+from ev2web.types import JobRequest, JobState, MutationResult
 
 
 def batch_mutations(mutations: str, batch_size: int = 4, max_chunks: int = 50) -> List[str]:
@@ -23,14 +24,16 @@ def batch_mutations(mutations: str, batch_size: int = 4, max_chunks: int = 50) -
 
 
 def create_job(request: JobRequest) -> int:
-    mutation_batches = batch_mutations(request.mutations)
+    # mutation_batches = batch_mutations(request.mutations)
+    # mutation_variables = [
+    #     {"key": f"MUTATIONS_{i}", "value": request.mutations}
+    #     for i, mutations in enumerate(mutation_batches)
+    # ]
     variables = [
+        {"key": "PROTEIN_STRUCTURE_URL", "value": request.protein_structure_url},
         {"key": "PROTEIN_SEQUENCE", "value": request.protein_sequence},
+        {"key": "MUTATIONS", "value": request.mutations},
         {"key": "LIGAND_SEQUENCE", "value": request.ligand_sequence},
-        {"key": "STRUCTURAL_TEMPLATE", "value": request.structural_template},
-    ] + [
-        {"key": f"MUTATIONS_{i}", "value": mutations}
-        for i, mutations in enumerate(mutation_batches)
     ]
     with gitlab.Gitlab(config.GITLAB_HOST_URL, config.GITLAB_AUTH_TOKEN) as gl:
         project = gl.projects.get(config.GITLAB_PROJECT_ID)
@@ -59,14 +62,14 @@ def get_job_state(job_id: int) -> JobState:
     return job_state
 
 
-def get_job_result(job_id: int) -> JobResult:
+def get_job_result(job_id: int) -> List[MutationResult]:
     with gitlab.Gitlab(config.GITLAB_HOST_URL, config.GITLAB_AUTH_TOKEN) as gl:
         project = gl.projects.get(config.GITLAB_PROJECT_ID)
         pipeline = project.pipelines.get(job_id)
 
         pipeline_job = None
         for _job in pipeline.jobs.list():
-            if _job.name == "collect-results" and _job.status == "success":
+            if _job.name == "predict-mutation-effect" and _job.status == "success":
                 pipeline_job = _job
                 break
         if pipeline_job is None:
@@ -75,8 +78,8 @@ def get_job_result(job_id: int) -> JobResult:
         job = project.jobs.get(pipeline_job.id, lazy=True)
 
         try:
-            data = job.artifact("results/combined.json")
+            data = job.artifact("results/results.json")
         except ChunkedEncodingError:
             raise GitlabHttpError
 
-    return json.loads(data.decode())
+    return [json.loads(line) for line in data.strip()]

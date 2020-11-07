@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -17,7 +17,7 @@ class JobRequest(BaseModel):
                     "GSMEIRVRVEKDPELGFSISGGVGGRGNPFRPDDDGIFVTRVQPEGPASKLLQPGDKIIQA"
                     "NGYSFINIEHGQAVSLLKTFQNTVELIIVREVSS"
                 ),
-                "mutations": "A1G,A1L",
+                "mutations": "G1A,G1C",
                 "ligand_sequence": "EYLGLDVPV",
             }
         }
@@ -37,29 +37,11 @@ class JobState(BaseModel):
     web_url: Optional[str]
 
 
-class Mutation(BaseModel):
+class MutationResult(BaseModel):
     mutation: str
-    ev2_score: float
-    ev2seq_score: float
-    rosetta_score: float
-    errors: Optional[str]
-
-
-class JobResult(BaseModel):
-    """The main job class populated throughout the job execution pipeline."""
-
-    # Protein and mutation info
-    protein_sequence: str
-    mutations: str
-    ligand_sequence: Optional[str]
-
-    # Structural template
-    query_start_pos: int
-    query_end_pos: int
-    alignment_query_sequence: str
-    alignment_template_sequence: str
-    structural_template: str
-    homology_model: str
-
-    # Mutation
-    mutation_scores: List[Mutation]
+    protbert_core: float
+    proteinsolver_core: float
+    el2core: float
+    protbert_interface: Optional[float]
+    proteinsolver_interface: Optional[float]
+    el2interface: Optional[float]

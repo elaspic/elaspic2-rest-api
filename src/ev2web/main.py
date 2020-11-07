@@ -4,6 +4,7 @@ The architecture of the REST API was heavily inspired by:
 <http://restalk-patterns.org/long-running-operation-polling.html>.
 """
 import asyncio
+from typing import List
 
 import sentry_sdk
 from fastapi import FastAPI, HTTPException
@@ -14,7 +15,7 @@ from starlette.requests import Request
 from starlette.responses import RedirectResponse, Response
 
 from ev2web import config, gitlab, utils
-from ev2web.types import JobRequest, JobResponse, JobResult, JobState
+from ev2web.types import JobRequest, JobResponse, JobState, MutationResult
 
 app = FastAPI(
     title="ELASPIC v2",
@@ -112,7 +113,7 @@ async def delete_job(job_id: int):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
-@app.get("/jobs/{job_id}/results", response_model=JobResult, tags=["jobs"])
+@app.get("/jobs/{job_id}/results", response_model=List[MutationResult], tags=["jobs"])
 async def get_job_result(job_id: int):
     """Get the result of a previously-submitted job.
 
