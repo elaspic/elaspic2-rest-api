@@ -78,8 +78,8 @@ def get_job_result(job_id: int) -> List[MutationResult]:
         job = project.jobs.get(pipeline_job.id, lazy=True)
 
         try:
-            data = job.artifact("results/results.json")
+            data = job.artifact("results/results.jsonl")
         except ChunkedEncodingError:
             raise GitlabHttpError
 
-    return [json.loads(line) for line in data.strip()]
+    return [json.loads(line) for line in data.strip().split(b"\n")]
