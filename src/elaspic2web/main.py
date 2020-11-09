@@ -14,6 +14,7 @@ from starlette import status
 from starlette.requests import Request
 from starlette.responses import RedirectResponse, Response
 
+import elaspic2web
 from elaspic2web import config, gitlab, utils
 from elaspic2web.types import JobRequest, JobResponse, JobState, MutationResult
 
@@ -25,7 +26,7 @@ Code showing how to use the REST API endpoings is provided as part of the `ELASP
 [documentation](https://gitlab.com/elaspic/elaspic2#rest-api).
 """
 
-app = FastAPI(title="ELASPIC2 REST API", description=description, version="0.1.0")
+app = FastAPI(title="ELASPIC2 REST API", description=description, version=elaspic2web.__version__)
 
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
