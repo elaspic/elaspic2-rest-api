@@ -18,7 +18,7 @@ requirements:
 
 test:
   imports:
-    - ev2web
+    - elaspic2web
 
 about:
   home: https://gitlab.com/elaspic/elaspic2-web

@@ -6,8 +6,8 @@ import gitlab
 from gitlab import GitlabDeleteError, GitlabHttpError  # noqa
 from requests.exceptions import ChunkedEncodingError
 
-from ev2web import config
-from ev2web.types import JobRequest, JobState, MutationResult
+from elaspic2web import config
+from elaspic2web.types import JobRequest, JobState, MutationResult
 
 
 def batch_mutations(mutations: str, batch_size: int = 4, max_chunks: int = 50) -> List[str]:

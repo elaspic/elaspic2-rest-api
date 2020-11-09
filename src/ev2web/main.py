@@ -14,8 +14,8 @@ from starlette import status
 from starlette.requests import Request
 from starlette.responses import RedirectResponse, Response
 
-from ev2web import config, gitlab, utils
-from ev2web.types import JobRequest, JobResponse, JobState, MutationResult
+from elaspic2web import config, gitlab, utils
+from elaspic2web.types import JobRequest, JobResponse, JobState, MutationResult
 
 description = """\
 This page lists `ELASPIC2` REST API endpoints that are available for evaluating the effect

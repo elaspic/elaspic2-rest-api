@@ -7,7 +7,7 @@ def read_md(file):
 
 
 setup(
-    name="ev2web",
+    name="elaspic2web",
     version="0.1.0",
     description="ELASPIC v2 web server",
     long_description=read_md("README.md"),
@@ -19,7 +19,7 @@ setup(
     package_data={},
     include_package_data=True,
     zip_safe=True,
-    keywords="ev2web",
+    keywords="elaspic2web",
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
         "Intended Audience :: Developers",

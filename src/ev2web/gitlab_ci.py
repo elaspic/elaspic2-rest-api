@@ -3,7 +3,7 @@ from typing import Optional
 
 import jinja2
 
-from ev2web.types import JobRequest
+from elaspic2web.types import JobRequest
 
 _templates_env: Optional[jinja2.Environment] = None
 
