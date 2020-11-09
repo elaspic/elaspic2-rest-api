@@ -8,7 +8,7 @@ def read_md(file):
 
 setup(
     name="elaspic2_web",
-    version="0.1.1",
+    version="0.1.2",
     description="ELASPIC v2 web server",
     long_description=read_md("README.md"),
     author="Alexey Strokach",
