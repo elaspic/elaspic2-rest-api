@@ -23,11 +23,11 @@ test:
     - python -m black --config pyproject.toml --check .
     # MyPy does not support namespace packages until this issue gets resolved:
     # https://github.com/python/mypy/issues/1645
-    - python -m mypy src/elaspic2web || true
+    - python -m mypy src/elaspic2_web || true
 
     # Test
     - python -m pip install -q -r requirements-base.txt -r requirements-dev.txt .
-    - PKG_INSTALL_DIR=$(python -c "import elaspic2web; print(elaspic2web.__path__[0])")
+    - PKG_INSTALL_DIR=$(python -c "import elaspic2_web; print(elaspic2_web.__path__[0])")
     - python -m pytest
       -c setup.cfg
       --cov="${PKG_INSTALL_DIR}"

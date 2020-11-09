@@ -13,5 +13,5 @@ To start the web server locally, source all environment variables hidden in the
 `env_variables.yaml` configuration file, and then run the following command.
 
 ```bash
-uvicorn elaspic2web:app --reload --host 0.0.0.0
+uvicorn elaspic2_web:app --reload --host 0.0.0.0
 ```
