@@ -17,11 +17,15 @@ from starlette.responses import RedirectResponse, Response
 from ev2web import config, gitlab, utils
 from ev2web.types import JobRequest, JobResponse, JobState, MutationResult
 
-app = FastAPI(
-    title="ELASPIC v2",
-    description="Version 2 of the ELASPIC pipeline (<http://elaspic.kimlab.org>).",
-    version="0.1.0",
-)
+description = """\
+This page lists `ELASPIC2` REST API endpoints that are available for evaluating the effect
+of mutations on protein stability and protein interaction affinity.
+
+Code showing how to use the REST API endpoings is provided as part of the `ELASPIC2`
+[documentation](https://gitlab.com/elaspic/elaspic2#rest-api).
+"""
+
+app = FastAPI(title="ELASPIC2 REST API", description=description, version="0.1.0")
 
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
