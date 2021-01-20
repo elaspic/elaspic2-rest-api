@@ -26,7 +26,9 @@ Code showing how to use the REST API endpoings is provided as part of the `ELASP
 [documentation](https://gitlab.com/elaspic/elaspic2#rest-api).
 """
 
-app = FastAPI(title="ELASPIC2 REST API", description=description, version=elaspic2_rest_api.__version__)
+app = FastAPI(
+    title="ELASPIC2 REST API", description=description, version=elaspic2_rest_api.__version__
+)
 
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
