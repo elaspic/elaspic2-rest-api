@@ -4,4 +4,4 @@ Modules
 .. autosummary::
    :toctree: _modules
 
-   elaspic2_web
+   elaspic2_rest_api

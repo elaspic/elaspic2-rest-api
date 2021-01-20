@@ -14,9 +14,9 @@ from starlette import status
 from starlette.requests import Request
 from starlette.responses import RedirectResponse, Response
 
-import elaspic2_web
-from elaspic2_web import config, gitlab, utils
-from elaspic2_web.types import JobRequest, JobResponse, JobState, MutationResult
+import elaspic2_rest_api
+from elaspic2_rest_api import config, gitlab, utils
+from elaspic2_rest_api.types import JobRequest, JobResponse, JobState, MutationResult
 
 description = """\
 This page lists `ELASPIC2` REST API endpoints that are available for evaluating the effect
@@ -26,7 +26,7 @@ Code showing how to use the REST API endpoings is provided as part of the `ELASP
 [documentation](https://gitlab.com/elaspic/elaspic2#rest-api).
 """
 
-app = FastAPI(title="ELASPIC2 REST API", description=description, version=elaspic2_web.__version__)
+app = FastAPI(title="ELASPIC2 REST API", description=description, version=elaspic2_rest_api.__version__)
 
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 

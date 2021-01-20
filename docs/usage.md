@@ -1,7 +1,7 @@
 # Usage
 
-To use `elaspic2-web` in a project:
+To use `elaspic2-rest-api` in a project:
 
 ```python
-import elaspic2_web
+import elaspic2_rest_api
 ```
