@@ -1,5 +1,5 @@
 package:
-  name: elaspic2-web
+  name: elaspic2-rest-api
   version: 0.1.2
 
 source:
@@ -15,12 +15,26 @@ requirements:
     - python
   run:
     - python
+    # Webserver packages
+    - aiofiles =0.5
+    - aiohttp =3.7
+    - aiomysql =0.0.21
+    - bleach =3.2
+    - fastapi =0.61
+    - fire =0.3
+    - gunicorn =20.0
+    - jinja2 =2.11
+    - python-dotenv =0.15
+    - sentry-sdk =0.19
+    - uvicorn =0.11
+    # Other packages
+    - python-gitlab =2.5
 
 test:
   imports:
-    - elaspic2_web
+    - elaspic2_rest_api
 
 about:
-  home: https://gitlab.com/elaspic/elaspic2-web
+  home: https://gitlab.com/elaspic/elaspic2-rest-api
   license: MIT License
-  summary: "ELASPIC v2 web server"
+  summary: "ELASPIC2 REST API"
