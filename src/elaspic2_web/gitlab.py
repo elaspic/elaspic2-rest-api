@@ -82,18 +82,4 @@ def get_job_result(job_id: int) -> List[MutationResult]:
         except ChunkedEncodingError:
             raise GitlabHttpError
 
-    try:
-        return [json.loads(line) for line in data.strip().split(b"\n")]
-    except json.JSONDecodeError:
-        # TODO(ostrokach): Get rid of this once the ELASPIC rest API is able to handle empty lists
-        # as return values.
-        dummy_mutation_result = {
-            "mutation": "1A1",
-            "protbert_core": 9999.0,
-            "proteinsolver_core": 9999.0,
-            "el2core": 9999.0,
-            "protbert_interface": 9999.0,
-            "proteinsolver_interface": 9999.0,
-            "el2interface": 9999.0,
-        }
-        return [dummy_mutation_result]
+    return [json.loads(line) for line in data.strip().split(b"\n") if line.strip()]
