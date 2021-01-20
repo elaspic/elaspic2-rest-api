@@ -78,3 +78,5 @@ target/
 
 # Secrets
 env_variables.yaml
+.env
+.env.*
