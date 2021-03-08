@@ -14,8 +14,8 @@ RUN apt-get -qq -o=Dpkg::Use-Pty=0 update \
 SHELL ["/bin/bash", "-c"]
 
 RUN umask 0002 \
-    && curl -sS https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -o miniconda.sh \
-    && openssl dgst -sha256 miniconda.sh | grep 1314b90489f154602fd794accfc90446111514a5a72fe1f71ab83e07de9504a7 \
+    && curl -sS -L https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh > miniconda.sh \
+    && openssl dgst -sha256 miniconda.sh | grep 5a827a62d98ba2217796a9dc7673380257ed7c161017565fba8ce785fb21a599 \
     && bash miniconda.sh -b -p /opt/conda \
     && rm miniconda.sh \
     && chmod g=u /opt/conda \
