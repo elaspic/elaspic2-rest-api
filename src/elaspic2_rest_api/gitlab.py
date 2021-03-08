@@ -5,6 +5,7 @@ from typing import List
 import gitlab
 from gitlab import GitlabDeleteError, GitlabHttpError  # noqa
 from requests.exceptions import ChunkedEncodingError
+from typing import Tuple, Optional
 
 from elaspic2_rest_api import config
 from elaspic2_rest_api.types import JobRequest, JobState, MutationResult
@@ -47,39 +48,47 @@ def delete_job(job_id: int) -> None:
         project.pipelines.delete(job_id)
 
 
-def get_job_state(job_id: int) -> JobState:
+def get_job_state(
+    job_id: int, collect_results: bool = False
+) -> Tuple[JobState, Optional[List[MutationResult]]]:
+    def collect_job_artifact(file: str):
+        try:
+            return job.artifact(file)
+        except ChunkedEncodingError:
+            raise GitlabHttpError
+
     with gitlab.Gitlab(config.GITLAB_HOST_URL, config.GITLAB_AUTH_TOKEN) as gl:
         project = gl.projects.get(config.GITLAB_PROJECT_ID)
         pipeline = project.pipelines.get(job_id)
 
-    job_state = JobState(
-        id=pipeline.id,
-        status=pipeline.status,
-        created_at=pipeline.created_at,
-        started_at=pipeline.started_at,
-        finished_at=pipeline.finished_at,
-    )
-    return job_state
-
-
-def get_job_result(job_id: int) -> List[MutationResult]:
-    with gitlab.Gitlab(config.GITLAB_HOST_URL, config.GITLAB_AUTH_TOKEN) as gl:
-        project = gl.projects.get(config.GITLAB_PROJECT_ID)
-        pipeline = project.pipelines.get(job_id)
-
-        pipeline_job = None
-        for _job in pipeline.jobs.list():
-            if _job.name == "predict-mutation-effect" and _job.status == "success":
-                pipeline_job = _job
-                break
-        if pipeline_job is None:
+        try:
+            pipeline_job = next(
+                (
+                    j
+                    for j in pipeline.jobs.list()
+                    if j.name == "predict-mutation-effect" and j.status == pipeline.status
+                )
+            )
+        except StopIteration:
             raise GitlabHttpError
 
         job = project.jobs.get(pipeline_job.id, lazy=True)
 
-        try:
-            data = job.artifact("results/results.jsonl")
-        except ChunkedEncodingError:
-            raise GitlabHttpError
+        input_data = collect_job_artifact("result/input.json")
+        if collect_results:
+            output_data = collect_job_artifact("results/results.jsonl")
 
-    return [json.loads(line) for line in data.strip().split(b"\n") if line.strip()]
+    job_state = JobState(
+        id=pipeline.id,
+        status="pending" if pipeline.status == "failed" and not input_data else pipeline.status,
+        created_at=pipeline.created_at,
+        started_at=pipeline.started_at,
+        finished_at=pipeline.finished_at,
+    )
+    job_result = (
+        [json.loads(line) for line in output_data.strip().split(b"\n") if line.strip()]
+        if collect_results
+        else None
+    )
+
+    return job_state, job_result

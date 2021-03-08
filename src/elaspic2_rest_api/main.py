@@ -88,7 +88,7 @@ async def get_job_status(job_id: int, request: Request, response: Response):
     """
     loop = asyncio.get_running_loop()
     try:
-        job_state = await loop.run_in_executor(None, gitlab.get_job_state, job_id)
+        job_state, _ = await loop.run_in_executor(None, gitlab.get_job_state, job_id, False)
     except gitlab.GitlabHttpError:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
@@ -130,7 +130,7 @@ async def get_job_result(job_id: int):
     """
     loop = asyncio.get_running_loop()
     try:
-        job_result = await loop.run_in_executor(None, gitlab.get_job_result, job_id)
+        job_state, job_result = await loop.run_in_executor(None, gitlab.get_job_state, job_id, True)
     except gitlab.GitlabHttpError:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return job_result
@@ -153,4 +153,4 @@ async def on_shutdown() -> None:
 
 if config.SENTRY_DSN:
     sentry_sdk.init(config.SENTRY_DSN, traces_sample_rate=1.0)
-    app = SentryAsgiMiddleware(app)  # type: ignore
+    app = SentryAsgiMiddleware(app)
