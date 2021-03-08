@@ -4,7 +4,7 @@ The architecture of the REST API was heavily inspired by:
 <http://restalk-patterns.org/long-running-operation-polling.html>.
 """
 import asyncio
-from typing import List
+from typing import Any, Dict, List
 
 import sentry_sdk
 from fastapi import FastAPI, HTTPException
@@ -16,6 +16,7 @@ from starlette.responses import RedirectResponse, Response
 
 import elaspic2_rest_api
 from elaspic2_rest_api import config, gitlab, utils
+from elaspic2_rest_api.tasks import start_and_monitor_tasks
 from elaspic2_rest_api.types import JobRequest, JobResponse, JobState, MutationResult
 
 description = """\
@@ -27,8 +28,13 @@ Code showing how to use the REST API endpoings is provided as part of the `ELASP
 """
 
 app = FastAPI(
-    title="ELASPIC2 REST API", description=description, version=elaspic2_rest_api.__version__
+    title="ELASPIC2 REST API",
+    description=description,
+    version=elaspic2_rest_api.__version__,
 )
+
+app_data: Dict[str, Any] = {}
+
 
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
@@ -143,14 +149,14 @@ def warmup():
 
 @app.on_event("startup")
 async def on_startup() -> None:
-    pass
+    app_data["task_monitor"] = asyncio.create_task(start_and_monitor_tasks(), name="task_monitor")
 
 
 @app.on_event("shutdown")
 async def on_shutdown() -> None:
-    pass
+    app_data["task_monitor"].cancel()
 
 
 if config.SENTRY_DSN:
     sentry_sdk.init(config.SENTRY_DSN, traces_sample_rate=1.0)
-    app = SentryAsgiMiddleware(app)
+    app = SentryAsgiMiddleware(app)  # typing: ignore
