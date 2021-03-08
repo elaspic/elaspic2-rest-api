@@ -1,11 +1,10 @@
 import json
 import math
-from typing import List
+from typing import List, Optional, Tuple
 
 import gitlab
 from gitlab import GitlabDeleteError, GitlabHttpError  # noqa
 from requests.exceptions import ChunkedEncodingError
-from typing import Tuple, Optional
 
 from elaspic2_rest_api import config
 from elaspic2_rest_api.types import JobRequest, JobState, MutationResult
