@@ -1,7 +1,7 @@
 from setuptools import find_packages, setup
 
 
-def read_md(file):
+def read_file(file):
     with open(file) as fin:
         return fin.read()
 
@@ -10,7 +10,7 @@ setup(
     name="elaspic2_rest_api",
     version="0.1.3",
     description="ELASPIC v2 web server",
-    long_description=read_md("README.md"),
+    long_description=read_file("README.md"),
     author="Alexey Strokach",
     author_email="alex.strokach@utoronto.ca",
     url="https://gitlab.com/elaspic/elaspic2-rest-api",
@@ -18,6 +18,7 @@ setup(
     package_dir={"": "src"},
     package_data={},
     include_package_data=True,
+    install_requires=read_file("requirements.txt").strip().split("\n"),
     zip_safe=True,
     keywords="elaspic2_rest_api",
     classifiers=[
