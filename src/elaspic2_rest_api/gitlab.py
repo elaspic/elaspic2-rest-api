@@ -69,7 +69,7 @@ def get_job_state(
         job = project.jobs.get(pipeline_job.id, lazy=True)
 
         try:
-            input_data = job.artifact("result/input.json")
+            input_data = job.artifact("results/input.json")
         except GitlabGetError:
             input_data = None
 
