@@ -45,3 +45,4 @@ class MutationResult(BaseModel):
     protbert_interface: Optional[float]
     proteinsolver_interface: Optional[float]
     el2interface: Optional[float]
+    error_message: Optional[str]
