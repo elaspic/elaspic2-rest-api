@@ -31,6 +31,7 @@ app = FastAPI(
     title="ELASPIC2 REST API",
     description=description,
     version=elaspic2_rest_api.__version__,
+    root_path=config.ROOT_PATH,
 )
 
 app_data: Dict[str, Any] = {}
