@@ -1,12 +1,11 @@
 import asyncio
+from functools import partial
 from unittest.mock import patch
 
 import pytest
 
 import elaspic2_rest_api
 from elaspic2_rest_api.ci_utils import return_on_call
-
-from functools import partial
 
 
 @pytest.mark.asyncio
