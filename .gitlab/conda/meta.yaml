@@ -6,7 +6,7 @@ source:
   path: ../../
 
 build:
-  script: "{{ PYTHON }} -m pip install . --no-deps --ignore-installed -vv"
+  script: '{{ PYTHON }} -m pip install . --no-deps --ignore-installed -vv'
   number: 0
   noarch: python
 
@@ -15,7 +15,6 @@ requirements:
     - python
   run:
     - python =3.8
-    # Webserver packages
     - aiofiles =0.6
     - aiohttp =3.7
     - aiomysql =0.0.21
@@ -27,9 +26,7 @@ requirements:
     - python-dotenv =0.15
     - sentry-sdk =0.20
     - uvicorn =0.13
-    # Other packages
     - python-gitlab =2.6
-
 test:
   imports:
     - elaspic2_rest_api
@@ -37,4 +34,4 @@ test:
 about:
   home: https://gitlab.com/elaspic/elaspic2-rest-api
   license: MIT License
-  summary: "ELASPIC2 REST API"
+  summary: ELASPIC2 REST API
