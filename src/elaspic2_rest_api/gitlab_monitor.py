@@ -3,6 +3,7 @@ import logging
 from urllib.parse import urlencode
 
 import aiohttp
+from gitlab import GitlabHttpError
 
 from elaspic2_rest_api import config
 from elaspic2_rest_api.gitlab import get_job_state
@@ -66,8 +67,12 @@ async def select_premature_failures(pipeline_infos):
     for pipeline_info in pipeline_infos:
         if pipeline_info["status"] != "failed":
             continue
-        job_state, _ = await get_job_state(pipeline_info["id"], collect_results=False)
+        try:
+            job_state, _ = await get_job_state(pipeline_info["id"], collect_results=False)
+        except GitlabHttpError:
+            logger.error("Could not find jobs associated with pipeline %s", pipeline_infos["id"])
+            continue
         if job_state.status == "failed":
             continue
-        select_pipeline_infos.append(select_pipeline_infos)
+        select_pipeline_infos.append(pipeline_info)
     return select_pipeline_infos
