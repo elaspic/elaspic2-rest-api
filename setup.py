@@ -18,7 +18,6 @@ setup(
     package_dir={"": "src"},
     package_data={},
     include_package_data=True,
-    install_requires=read_file("requirements.txt").strip().split("\n"),
     zip_safe=True,
     keywords="elaspic2_rest_api",
     classifiers=[
