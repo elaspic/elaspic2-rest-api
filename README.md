@@ -34,6 +34,18 @@ uvicorn elaspic2_rest_apit_api:app --reload --host 0.0.0.0
 
 ## Deployment
 
-```bash
-gcloud app deploy
-```
+1. Build a Docker image.
+
+    ```bash
+    export CONDA_BLD_ARCHIVE_URL="https://gitlab.com/api/v4/projects/21459617/jobs/artifacts/master/download?job=build"
+
+    docker build --build-arg CONDA_BLD_ARCHIVE_URL --tag registry.gitlab.com/elaspic/elaspic2-rest-api:latest .gitlab/docker/
+    ```
+
+1. Run the built Docker image.
+
+    ```bash
+    docker run --tty --env-file .env --env HOST_USER_ID=9284 \
+        --env=GUNICORN_CMD_ARGS="--bind 0.0.0.0:8080 --workers 1" \
+        registry.gitlab.com/elaspic/elaspic2-rest-api:latest
+    ```
