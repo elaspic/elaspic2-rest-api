@@ -8,6 +8,23 @@ ELASPIC2 web server
 
 ## Development
 
+To create a development environment, run the following:
+
+```bash
+python scripts/meta_to_env.py -f .gitlab/conda/meta.yaml > environment.yaml
+mamba env create -f environment.yaml -p .venv/
+mamba env update -f environment-dev.yaml -p .venv/
+conda activate .venv/
+```
+
+To update the dev environment and the `meta.yaml` file:
+
+```bash
+conda activate .env/
+conda update --all
+./scripts/env_to_meta.py -f .gitlab/conda/meta.yaml
+```
+
 To start the web server locally, source all environment variables hidden in the
 `env_variables.yaml` configuration file, and then run the following command.
 
