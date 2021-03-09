@@ -1,0 +1,10 @@
+dependencies:
+  - black
+  - coverage
+  - flake8
+  - isort
+  - mypy
+  - pytest
+  - pytest-asyncio
+  - pytest-cov
+  - ruamel.yaml
