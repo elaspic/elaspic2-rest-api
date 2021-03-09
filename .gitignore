@@ -80,3 +80,4 @@ target/
 env_variables.yaml
 .env
 .env.*
+.venv
