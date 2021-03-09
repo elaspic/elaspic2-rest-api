@@ -4,6 +4,7 @@ from typing import List, Optional, Tuple
 
 import gitlab
 from gitlab import GitlabDeleteError, GitlabHttpError  # noqa
+from gitlab.exceptions import GitlabGetError
 from requests.exceptions import ChunkedEncodingError
 
 from elaspic2_rest_api import config
@@ -47,15 +48,9 @@ def delete_job(job_id: int) -> None:
         project.pipelines.delete(job_id)
 
 
-def get_job_state(
+async def get_job_state(
     job_id: int, collect_results: bool = False
 ) -> Tuple[JobState, Optional[List[MutationResult]]]:
-    def collect_job_artifact(file: str):
-        try:
-            return job.artifact(file)
-        except ChunkedEncodingError:
-            raise GitlabHttpError
-
     with gitlab.Gitlab(config.GITLAB_HOST_URL, config.GITLAB_AUTH_TOKEN) as gl:
         project = gl.projects.get(config.GITLAB_PROJECT_ID)
         pipeline = project.pipelines.get(job_id)
@@ -73,9 +68,16 @@ def get_job_state(
 
         job = project.jobs.get(pipeline_job.id, lazy=True)
 
-        input_data = collect_job_artifact("result/input.json")
+        try:
+            input_data = job.artifact("result/input.json")
+        except GitlabGetError:
+            input_data = None
+
         if collect_results:
-            output_data = collect_job_artifact("results/results.jsonl")
+            try:
+                output_data = job.artifact("results/results.jsonl")
+            except ChunkedEncodingError:
+                raise GitlabHttpError
 
     job_state = JobState(
         id=pipeline.id,
