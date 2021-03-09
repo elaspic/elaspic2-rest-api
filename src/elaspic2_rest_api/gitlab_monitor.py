@@ -15,6 +15,8 @@ GITLAB_PIPELINES_ENDPOINT = (
     f"{config.GITLAB_HOST_URL}/api/v4/projects/{config.GITLAB_PROJECT_ID}/pipelines"
 )
 
+KNOWN_REAL_FAILURES = set()
+
 
 async def retry_failed_jobs_task():
     """Retry jobs that were prematurely marked as failed."""
@@ -67,12 +69,15 @@ async def select_premature_failures(pipeline_infos):
     for pipeline_info in pipeline_infos:
         if pipeline_info["status"] != "failed":
             continue
+        if pipeline_info["id"] in KNOWN_REAL_FAILURES:
+            continue
         try:
             job_state, _ = await get_job_state(pipeline_info["id"], collect_results=False)
         except GitlabHttpError:
             logger.error("Could not find jobs associated with pipeline %s", pipeline_infos["id"])
             continue
         if job_state.status == "failed":
+            KNOWN_REAL_FAILURES.add(pipeline_info["id"])
             continue
         select_pipeline_infos.append(pipeline_info)
     return select_pipeline_infos
