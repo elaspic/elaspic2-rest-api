@@ -16,7 +16,7 @@ requirements:
   build:
     - python
   run:
-    - python
+    - python =3.8
   {% for req in data.get('install_requires', []) %}
     - {{ req.replace('==', ' =') }}
   {% endfor %}
