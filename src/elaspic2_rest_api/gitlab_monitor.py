@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from concurrent.futures import ThreadPoolExecutor
 from urllib.parse import urlencode
 
 import aiohttp
@@ -65,6 +66,8 @@ async def delete_pipelines(session, pipeline_infos):
 
 
 async def select_premature_failures(pipeline_infos):
+    loop = asyncio.get_running_loop()
+
     select_pipeline_infos = []
     for pipeline_info in pipeline_infos:
         if pipeline_info["status"] != "failed":
@@ -72,7 +75,9 @@ async def select_premature_failures(pipeline_infos):
         if pipeline_info["id"] in KNOWN_REAL_FAILURES:
             continue
         try:
-            job_state, _ = await get_job_state(pipeline_info["id"], collect_results=False)
+            job_state, _ = await loop.run_in_executor(
+                None, get_job_state, pipeline_info["id"], False
+            )
         except GitlabHttpError:
             logger.error("Could not find jobs associated with pipeline %s", pipeline_infos["id"])
             continue

@@ -48,7 +48,7 @@ def delete_job(job_id: int) -> None:
         project.pipelines.delete(job_id)
 
 
-async def get_job_state(
+def get_job_state(
     job_id: int, collect_results: bool = False
 ) -> Tuple[JobState, Optional[List[MutationResult]]]:
     with gitlab.Gitlab(config.GITLAB_HOST_URL, config.GITLAB_AUTH_TOKEN) as gl:
