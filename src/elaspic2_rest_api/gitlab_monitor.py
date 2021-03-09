@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from urllib.parse import urlencode
 
 import aiohttp
 
@@ -7,6 +8,11 @@ from elaspic2_rest_api import config
 from elaspic2_rest_api.gitlab import get_job_state
 
 logger = logging.getLogger(__name__)
+
+
+GITLAB_PIPELINES_ENDPOINT = (
+    f"{config.GITLAB_HOST_URL}/api/v4/projects/{config.GITLAB_PROJECT_ID}/pipelines"
+)
 
 
 async def retry_failed_jobs_task():
@@ -20,11 +26,10 @@ async def retry_failed_jobs_task():
             await asyncio.sleep(300)
 
 
-async def get_pipeline_infos(session):
-    next_url = (
-        f"{config.GITLAB_HOST_URL}/api/v4/projects/{config.GITLAB_PROJECT_ID}/pipelines"
-        "?per_page=100&status=failed"
-    )
+async def get_pipeline_infos(session, params=[("per_page", "100"), ("status", "failed")]):
+    next_url = f"{GITLAB_PIPELINES_ENDPOINT}"
+    if params:
+        next_url += "?" + urlencode(params)
     pipeline_infos = []
     while next_url is not None:
         async with session.get(
@@ -38,6 +43,24 @@ async def get_pipeline_infos(session):
     return pipeline_infos
 
 
+async def retry_pipelines(session, pipeline_infos):
+    for pipeline_info in pipeline_infos:
+        url = f"{GITLAB_PIPELINES_ENDPOINT}/{pipeline_info['id']}/retry"
+        async with session.post(
+            url, headers=[("PRIVATE-TOKEN", config.GITLAB_AUTH_TOKEN)]
+        ) as response:
+            assert response.ok
+
+
+async def delete_pipelines(session, pipeline_infos):
+    for pipeline_info in pipeline_infos:
+        url = f"{GITLAB_PIPELINES_ENDPOINT}/{pipeline_info['id']}"
+        async with session.delete(
+            url, headers=[("PRIVATE-TOKEN", config.GITLAB_AUTH_TOKEN)]
+        ) as response:
+            assert response.ok
+
+
 async def select_premature_failures(pipeline_infos):
     select_pipeline_infos = []
     for pipeline_info in pipeline_infos:
@@ -48,27 +71,3 @@ async def select_premature_failures(pipeline_infos):
             continue
         select_pipeline_infos.append(select_pipeline_infos)
     return select_pipeline_infos
-
-
-async def retry_pipelines(session, pipeline_infos):
-    for pipeline_info in pipeline_infos:
-        url = (
-            f"https://gitlab.com/api/v4/projects/{config.GITLAB_PROJECT_ID}/pipelines/"
-            f"{pipeline_info['id']}/retry"
-        )
-        async with session.post(
-            url, headers=[("PRIVATE-TOKEN", config.GITLAB_AUTH_TOKEN)]
-        ) as response:
-            assert response.ok
-
-
-async def delete_pipelines(session, pipeline_infos):
-    for pipeline_info in pipeline_infos:
-        url = (
-            f"https://gitlab.com/api/v4/projects/{config.GITLAB_PROJECT_ID}/pipelines/"
-            f"{pipeline_info['id']}"
-        )
-        async with session.delete(
-            url, headers=[("PRIVATE-TOKEN", config.GITLAB_AUTH_TOKEN)]
-        ) as response:
-            assert response.ok
