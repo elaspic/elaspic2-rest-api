@@ -18,7 +18,7 @@ requirements:
   run:
     - python
     {% for req in data.get('install_requires', []) %}
-      - {{ req }}
+      - {{ req.replace('==', ' =') }}
     {% endfor %}
 
 test:
