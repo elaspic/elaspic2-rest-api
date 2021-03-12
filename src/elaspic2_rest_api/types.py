@@ -38,7 +38,7 @@ class JobState(BaseModel):
 
 
 class MutationResult(BaseModel):
-    mutation: str
+    mutation: Optional[str]
     protbert_core: Optional[float]
     proteinsolver_core: Optional[float]
     el2core: Optional[float]
