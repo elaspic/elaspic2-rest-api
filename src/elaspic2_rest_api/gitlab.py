@@ -70,13 +70,13 @@ def get_job_state(
 
         try:
             input_data = job.artifact("results/input.json")
-        except GitlabGetError:
+        except (GitlabGetError, ChunkedEncodingError):
             input_data = None
 
         if collect_results:
             try:
                 output_data = job.artifact("results/results.jsonl")
-            except ChunkedEncodingError:
+            except (GitlabGetError, ChunkedEncodingError):
                 raise GitlabHttpError
 
     job_state = JobState(
