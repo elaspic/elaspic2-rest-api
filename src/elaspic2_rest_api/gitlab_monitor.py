@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from typing import Any, Dict, List
 from urllib.parse import urlencode
 
 import aiohttp
@@ -64,24 +65,29 @@ async def delete_pipelines(session, pipeline_infos):
             assert response.ok
 
 
-async def select_premature_failures(pipeline_infos):
+async def select_premature_failures(pipeline_infos, limit: int = 100):
     loop = asyncio.get_running_loop()
 
-    select_pipeline_infos = []
+    select_pipeline_infos: List[Dict[str, Any]] = []
     for pipeline_info in pipeline_infos:
+        if limit and len(select_pipeline_infos) >= limit:
+            break
+
         if pipeline_info["status"] != "failed":
             continue
         if pipeline_info["id"] in KNOWN_REAL_FAILURES:
             continue
+
         try:
             job_state, _ = await loop.run_in_executor(
                 None, get_job_state, pipeline_info["id"], False
             )
         except GitlabHttpError:
-            logger.error("Could not find jobs associated with pipeline %s", pipeline_info["id"])
-            continue
-        if job_state.status == "failed":
-            KNOWN_REAL_FAILURES.add(pipeline_info["id"])
-            continue
+            logger.info("Could not find jobs associated with pipeline %s", pipeline_info["id"])
+        else:
+            if job_state.status == "failed":
+                KNOWN_REAL_FAILURES.add(pipeline_info["id"])
+                continue
+
         select_pipeline_infos.append(pipeline_info)
     return select_pipeline_infos
