@@ -9,7 +9,7 @@ default_context:
   project_slug: "elaspic2_rest_api"
   project_import: "elaspic2_rest_api"
   project_short_description: "ELASPIC v2 web server"
-  version: "0.1.9"
+  version: "0.1.10"
   create_author_file: "y"
   open_source_license: "MIT License"
   _copy_without_render:

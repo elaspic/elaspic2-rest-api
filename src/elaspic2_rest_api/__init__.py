@@ -1,4 +1,4 @@
-__version__ = "0.1.9"
+__version__ = "0.1.10"
 __all__ = ["config", "types", "state", "utils", "bin_utils", "ci_utils", "gitlab", "db", "jobs"]
 
 from . import *
