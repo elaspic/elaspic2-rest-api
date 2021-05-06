@@ -78,7 +78,7 @@ async def select_premature_failures(pipeline_infos):
                 None, get_job_state, pipeline_info["id"], False
             )
         except GitlabHttpError:
-            logger.error("Could not find jobs associated with pipeline %s", pipeline_infos["id"])
+            logger.error("Could not find jobs associated with pipeline %s", pipeline_info["id"])
             continue
         if job_state.status == "failed":
             KNOWN_REAL_FAILURES.add(pipeline_info["id"])
