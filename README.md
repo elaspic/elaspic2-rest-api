@@ -1,8 +1,8 @@
 # elaspic2-rest-api
 
-[![docs](https://img.shields.io/badge/docs-v0.1.11-blue.svg)](https://ostrokach.gitlab.io/elaspic2-rest-api/v0.1.11/)
-[![pipeline status](https://gitlab.com/elaspic/elaspic2-rest-api/badges/v0.1.11/pipeline.svg)](https://gitlab.com/elaspic/elaspic2-rest-api/commits/v0.1.11/)
-[![coverage report](https://gitlab.com/elaspic/elaspic2-rest-api/badges/v0.1.11/coverage.svg)](https://elaspic.gitlab.io/elaspic2-rest-api/v0.1.11/htmlcov/)
+[![docs](https://img.shields.io/badge/docs-v0.1.12-blue.svg)](https://ostrokach.gitlab.io/elaspic2-rest-api/v0.1.12/)
+[![pipeline status](https://gitlab.com/elaspic/elaspic2-rest-api/badges/v0.1.12/pipeline.svg)](https://gitlab.com/elaspic/elaspic2-rest-api/commits/v0.1.12/)
+[![coverage report](https://gitlab.com/elaspic/elaspic2-rest-api/badges/v0.1.12/coverage.svg)](https://elaspic.gitlab.io/elaspic2-rest-api/v0.1.12/htmlcov/)
 
 ELASPIC2 web server
 
