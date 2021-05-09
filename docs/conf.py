@@ -42,7 +42,7 @@ gitlab_doc_root = "https://gitlab.com/elaspic/elaspic2-rest-api/-/tree/master/"
 
 
 def setup(app):
-    app.add_stylesheet("css/custom.css")
+    app.add_css_file("css/custom.css")
     app.add_config_value(
         "recommonmark_config",
         {
